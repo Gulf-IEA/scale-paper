@@ -1,0 +1,301 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<echo=FALSE>>=
+options(width=10)
+@
+
+<<>>=
+wetlands <- read.csv("C:/Users/amy.freitag/Documents/GulfIEA/TipPoints/wetlandschange2.csv")
+attach(wetlands)
+library(ggplot2)
+library(Rmisc)
+library(lmtest)
+@
+
+plot average wetland loss at each of four scales:
+<<fig=TRUE>>=
+byscale <- summarySE(wetlands, measurevar="net_change", groupvars=c("scale", "time_period"))
+p <- ggplot(byscale, aes(time_period, net_change)) + geom_line() + geom_point() +
+  geom_errorbar(aes(ymin=net_change-se, ymax=net_change+se, width=.1)) 
+p + facet_grid(rows=vars(scale), scales="free") + ylab("net change (acres)") +
+  xlab("time period") + scale_x_discrete(limits = 1:11, labels=c("1"="1985-1988","2"="1988-1990","3"="1990-1995","4"="1995-1998","5"="1998-1999","6"="1999-2002","7"="2002-2004","8"="2004-2006","9"="2006-2008","10"="2008-2009","11"="2009-2010")) + theme(axis.text.x = element_text(angle = 90))
+@
+
+plot proportional wetland loss at each of four scales:
+<<fig=TRUE>>=
+byscaleP <- summarySE(wetlands, measurevar="prop_change", groupvars=c("scale", "time_period"))
+p <- ggplot(byscaleP, aes(time_period, prop_change)) + geom_line() + geom_point() +
+  geom_errorbar(aes(ymin=prop_change-se, ymax=prop_change+se, width=.1)) 
+p + facet_grid(rows=vars(scale), scales="free") + ylab("proportional change (acres)") +
+  xlab("time period") + scale_x_discrete(limits = 1:11, labels=c("1"="1985-1988","2"="1988-1990","3"="1990-1995","4"="1995-1998","5"="1998-1999","6"="1999-2002","7"="2002-2004","8"="2004-2006","9"="2006-2008","10"="2008-2009","11"="2009-2010")) + theme(axis.text.x = element_text(angle = 90))
+@
+
+plot wetland loss for each of the locations in each scale, to visualize the biggest changers:
+<<fig=TRUE>>=
+local <- wetlands[which(wetlands$scale=='local'),]
+parish <- wetlands[which(wetlands$scale=='parish'),]
+huc <- wetlands[which(wetlands$scale=='watershed'),]
+community <- wetlands[which(wetlands$scale=='community'),]
+q <- ggplot(parish, aes(time_period, net_change)) + geom_line() + geom_point()
+q + facet_wrap(~ID_code, ncol=3) + ylab("net change(acres)") + xlab("time period") +
+  labs(title="Coastal Parishes") + scale_x_discrete(limits = 1:11, labels=c("1"="1985-1988","2"="1988-1990","3"="1990-1995","4"="1995-1998","5"="1998-1999","6"="1999-2002","7"="2002-2004","8"="2004-2006","9"="2006-2008","10"="2008-2009","11"="2009-2010")) + theme(axis.text.x = element_text(angle = 90))
+@
+
+<<fig=TRUE>>=
+r <- ggplot(huc, aes(time_period, net_change)) + geom_line() + geom_point()
+r + facet_wrap(~ID_code, ncol=3) + ylab("net change(acres)") + xlab("time period") +
+  labs(title="HUC 8 Watersheds")
+@
+
+<<fig=TRUE>>=
+s <- ggplot(local, aes(time_period, net_change)) + geom_line() + geom_point()
+s + facet_wrap(~ID_code, ncol=5) + ylab("net change(acres)") + xlab("time period") +
+  labs(title="Trip Ticket Areas")
+@
+
+<<fig=TRUE>>=
+t <- ggplot(community, aes(time_period, net_change)) + geom_line() + geom_point()
+t + facet_wrap(~ID_code, ncol=5) + ylab("net change(acres)") + xlab("time period") +
+  labs(title="Communities")
+@
+
+test correlations with commercial engagement at the four different scales:
+<<>>=
+cor.test(local$net_change, local$comeng, method = "spearman")
+cor.test(parish$net_change, parish$comeng, method = "spearman")
+cor.test(huc$net_change, huc$comeng, method = "spearman")
+cor.test(community$net_change, community$comeng, method = "spearman")
+@
+
+Basic scatter plot of wetland loss and commercial engagement, shown for community but similar across all 4. Note also the upside-down U shape of the scatter plot, suggesting we may need to break up the correlation analysis in some way... stay tuned.
+<<fig=TRUE>>=
+u <- ggplot(data=community, aes(x=net_change, y=comeng))
+u + geom_point() + ylab("commercial engagement") + xlab("wetland loss, acres") + theme(axis.title=element_text(size=14), axis.text=element_text(size=12))
+@
+
+with trendline:
+<<fig=TRUE>>=
+mod = lm(community$comeng ~ community$net_change)
+u <- ggplot(data=community, aes(x=net_change, y=comeng))
+u + geom_point() + xlab("Wetland loss, acres") + ylab("Commercial Engagement Index") + geom_abline(slope=mod$coefficients[2], intercept = mod$coefficients[1]) + theme_grey(base_size=18)
+@
+test correlations with change in commercial engagement at the four different scales:
+<<>>=
+cor.test(local$net_change, local$comeng_change, method = "spearman")
+cor.test(parish$net_change, parish$comeng_change, method = "spearman")
+cor.test(huc$net_change, huc$comeng_change, method = "spearman")
+cor.test(community$net_change, community$comeng_change, method = "spearman")
+@
+
+So, in short, the only significant correlation at the p=.05 level is at the community level, using the network analysis method of calculating wetland change that people can access in roughly an hour. The local and parish levels also trend toward significant, but huc level does not at all. So it's not just a story of smaller scale = stronger correlations.
+
+For local scale (trip ticket areas) and hucs (calculated as aggregated trip ticket areas), test the correlations between wetland loss and three key wetland-dependent fisheries (blue crabs, northern brown shrimp, and oysters):
+<<>>=
+cor.test(local$net_change, local$lbs_bcrab, method = "spearman")
+cor.test(local$net_change, local$lbs_bcrab_change, method = "spearman")
+cor.test(huc$net_change, huc$lbs_bcrab, method = "spearman")
+cor.test(huc$net_change, huc$lbs_bcrab_change, method = "spearman")
+cor.test(community$net_change, community$lbs_bcrab, method = "spearman")
+cor.test(community$net_change, community$lbs_bcrab_change, method = "spearman")
+cor.test(parish$net_change, parish$lbs_bcrab, method = "spearman")
+cor.test(parish$net_change, parish$lbs_bcrab_change, method = "spearman")
+
+cor.test(local$net_change, local$lbs_shrimp, method = "spearman")
+cor.test(local$net_change, local$lbs_shrimp_change, method = "spearman")
+cor.test(huc$net_change, huc$lbs_shrimp, method = "spearman")
+cor.test(huc$net_change, huc$lbs_shrimp_change, method = "spearman")
+cor.test(community$net_change, community$lbs_shrimp, method = "spearman")
+cor.test(community$net_change, community$lbs_shrimp_change, method = "spearman")
+cor.test(parish$net_change, parish$lbs_shrimp, method = "spearman")
+cor.test(parish$net_change, parish$lbs_shrimp_change, method="spearman")
+
+cor.test(local$net_change, local$lbs_oyster, method = "spearman")
+cor.test(local$net_change, local$lbs_oyster_change, method = "spearman")
+cor.test(huc$net_change, huc$lbs_oyster, method = "spearman")
+cor.test(huc$net_change, huc$lbs_oyster_change, method="spearman")
+cor.test(community$net_change, community$lbs_oyster, method = "spearman")
+cor.test(community$net_change, community$lbs_oyster_change, method = "spearman")
+cor.test(parish$net_change, parish$lbs_oyster, method = "spearman")
+cor.test(parish$net_change, parish$lbs_oyster_change, method = "spearman")
+@
+Highlights: Blue crab landings highly correlated with wetland loss, change in blue crabs correlated at local scale and almost at huc scale. More complex theoretical interactions at the huc scale and lower n put this lack of significance in context, but mean there's likely still a story there. For shrimp and oysters, only the total catch was correlated with wetland loss at both scales.
+
+Test correlations with species-specific engagement
+<<>>==
+cor.test(community$net_change, community$oyster_eng, method = "spearman")
+cor.test(community$net_change, community$oyster_eng_change, method = "spearman")
+@
+
+
+Ok, so after all of the regular correlations, note that they are significant but negative, which doesn't actually make much sense. Given the nonlinear nature of the relationship (remember the scatter plot of net change vs. commercial engagement?), we may need to do something different. The simplest thing would be to break the data and run two correlations for each side of the nonlinearity (in this case, zero change). It may also be worth running a time series correlation, but let's start with simple.
+
+First, taking a look at huc (the largest scale). For the whole scale of change, correlations with commercial engagement were not significant but correlations with indicator species were. First, trying to break it apart at zero (the potential nonlinearity), and testing for correlations across the commercial fishing indicators. The graphs show the significant results depicted across whole range of wetland loss quantities: the pounds of indicator species landed. Correlation is significant across the whole range of wetland losses and for areas with wetland loss, but not for those with wetland gain.
+<<fig=TRUE>>=
+hucless <- huc[which(huc$net_change < 0),]
+hucmore <- huc[which(huc$net_change > 0),]
+cor.test(hucless$net_change, hucless$comeng, method = "spearman")
+cor.test(hucmore$net_change, hucmore$comeng, method = "spearman")
+cor.test(hucless$net_change, hucless$comeng_change, method = "spearman")
+cor.test(hucmore$net_change, hucmore$comeng_change, method = "spearman")
+cor.test(hucless$net_change, hucless$lbs_oyster, method = "spearman")
+cor.test(hucmore$net_change, hucmore$lbs_oyster, method = "spearman")
+cor.test(hucless$net_change, hucless$lbs_oyster_change, method = "spearman")
+cor.test(hucmore$net_change, hucmore$lbs_oyster_change, method = "spearman")
+cor.test(hucless$net_change, hucless$lbs_bcrab, method = "spearman")
+cor.test(hucmore$net_change, hucmore$lbs_bcrab, method = "spearman")
+cor.test(hucless$net_change, hucless$lbs_bcrab_change, method = "spearman")
+cor.test(hucmore$net_change, hucmore$lbs_bcrab_change, method = "spearman")
+cor.test(hucless$net_change, hucless$lbs_shrimp, method = "spearman")
+cor.test(hucmore$net_change, hucmore$lbs_shrimp, method = "spearman")
+cor.test(hucless$net_change, hucless$lbs_shrimp_change, method = "spearman")
+cor.test(hucmore$net_change, hucmore$lbs_shrimp_change, method = "spearman")
+
+u <- ggplot(data=huc,aes(x=net_change, y=lbs_oyster))
+u + geom_point() + geom_smooth(method='lm') + xlab("Net change in wetland acreage") + ylab("Pounds of oyster landed")
+@
+
+<<fig=TRUE>>=
+u <- ggplot(data=huc,aes(x=net_change, y=lbs_bcrab))
+u + geom_point() + geom_smooth(method='lm') + xlab("Net change in wetland acreage") + ylab("Pounds of blue crab landed")
+@
+
+<<fig=TRUE>>=
+u <- ggplot(data=huc,aes(x=net_change, y=lbs_shrimp))
+u + geom_point() + geom_smooth(method='lm') + xlab("Net change in wetland acreage") + ylab("Pounds of shrimp landed")
+@
+
+Next, turning to the parish scale and doing the same thing, attempting to break the data set apart at neutral wetlands. We only have oyster catches at this scale at this point, but follows the pattern of hucs with significant correlations in areas of wetland loss driving a correlation in the whole dataset (pictured in the figure). We also have oyster engagement at this scale, which follows the same pattern as oyster landings.
+<<fig=TRUE>>=
+parishless <- parish[which(parish$net_change < 0),]
+parishmore <- parish[which(parish$net_change > 0),]
+cor.test(parishless$net_change, parishless$comeng, method = "spearman")
+cor.test(parishmore$net_change, parishmore$comeng, method = "spearman")
+cor.test(parishless$net_change, parishless$comeng_change, method = "spearman")
+cor.test(parishmore$net_change, parishmore$comeng_change, method = "spearman")
+cor.test(parishless$net_change, parishless$lbs_oyster, method = "spearman")        
+cor.test(parishmore$net_change, parishmore$lbs_oyster, method = "spearman")
+cor.test(parishless$net_change, parishless$lbs_oyster_change, method = "spearman")
+cor.test(parishmore$net_change, parishmore$lbs_oyster_change, method = "spearman")
+cor.test(parishless$net_change, parishless$oyster_eng, method = "spearman")
+cor.test(parishmore$net_change, parishmore$oyster_eng, method = "spearman")
+cor.test(parishless$net_change, parishless$oyster_eng_change, method = "spearman")
+cor.test(parishmore$net_change, parishmore$oyster_eng_change, method = "spearman")
+
+u <- ggplot(data=parish,aes(x=net_change, y=lbs_oyster))
+u + geom_point() + geom_smooth(method='lm') + xlab("Net change in wetland acreage") + ylab("Pounds of oyster landed")
+@
+
+<<fig=TRUE>>=
+u <- ggplot(data=parish,aes(x=net_change, y=oyster_eng))
+u + geom_point() + geom_smooth(method='lm') + xlab("Net change in wetland acreage") + ylab("Commercial Oystering Engagement Index")
+@
+
+Finally, turning to the local scale and breaking up the data in a similar way. Note there is a much higher n for trip ticket zones, so things are more likely to be significant even with a bunch of variation. Commercial engagement now has a slight negative correlation that's signficant for areas with wetland loss and positive for areas with wetland gain, suggesting a nonlinearity. Significant correlations marked, but graphs still need to be made incorporating both regression lines [which ones do we want? 8 is probably too many]
+<<fig=TRUE>>=
+localless <- local[which(local$net_change < 0),]
+localmore <- local[which(local$net_change > 0),]
+cor.test(localless$net_change, localless$comeng, method = "spearman")            #*neg
+cor.test(localmore$net_change, localmore$comeng, method = "spearman")            #*pos
+cor.test(localless$net_change, localless$comeng_change, method = "spearman")
+cor.test(localmore$net_change, localmore$comeng_change, method = "spearman")
+cor.test(localless$net_change, localless$lbs_oyster, method = "spearman")        #*neg
+cor.test(localmore$net_change, localmore$lbs_oyster, method = "spearman")
+cor.test(localless$net_change, localless$lbs_oyster_change, method = "spearman")
+cor.test(localmore$net_change, localmore$lbs_oyster_change, method = "spearman")
+cor.test(localless$net_change, localless$lbs_bcrab, method = "spearman")         #*neg
+cor.test(localmore$net_change, localmore$lbs_bcrab, method = "spearman")         #*pos
+cor.test(localless$net_change, localless$lbs_bcrab_change, method = "spearman")
+cor.test(localmore$net_change, localmore$lbs_bcrab_change, method = "spearman")  #*
+cor.test(localless$net_change, localless$lbs_shrimp, method = "spearman")        #*neg
+cor.test(localmore$net_change, localmore$lbs_shrimp, method = "spearman")        #*pos
+cor.test(localless$net_change, localless$lbs_shrimp_change, method = "spearman")
+cor.test(localmore$net_change, localmore$lbs_shrimp_change, method = "spearman")
+
+mod <- lm(localless$comeng~localless$net_change)
+modmore <- lm(localmore$comeng~localmore$net_change)
+u <- ggplot(data=local,aes(x=net_change, y=comeng))
+u + geom_point() + geom_abline(slope=mod$coefficients[2], intercept = mod$coefficients[1]) + geom_abline(slope = modmore$coefficients[2], intercept = modmore$coefficients[1]) + xlab("Net change in wetland acreage") + ylab("Commercial Engagement Index")
+@
+
+Last but not least, the community scale. Reminder that the wetlands data underpinning this analysis are not the USGS data and they were calculated by a back-of-the-envelope network distance calculation rather than total area. So, this part of the analysis is functionally not part of the multi-scalar investigation, but might be useful in comparing with local, the other small-scale analysis. Again, significant correlations are marked but we still need to decide which graphs are most useful.
+<<fig=TRUE>>=
+communityless <- community[which(community$net_change < 0),]
+communitymore <- community[which(community$net_change > 0),]
+cor.test(communityless$net_change, communityless$comeng, method = "spearman")    #*neg
+cor.test(communitymore$net_change, communitymore$comeng, method = "spearman")    #*pos
+cor.test(communityless$net_change, communityless$comeng_change, method = "spearman")
+cor.test(communitymore$net_change, communitymore$comeng_change, method = "spearman")
+cor.test(communityless$net_change, communityless$lbs_oyster, method = "spearman")#*neg
+cor.test(communitymore$net_change, communitymore$lbs_oyster, method = "spearman")
+cor.test(communityless$net_change, communityless$lbs_oyster_change, method = "spearman")
+cor.test(communitymore$net_change, communitymore$lbs_oyster_change, method = "spearman")
+cor.test(communityless$net_change, communityless$oyster_eng, method = "spearman")#neg
+cor.test(communitymore$net_change, communitymore$oyster_eng, method = "spearman")
+cor.test(communityless$net_change, communityless$oyster_eng_change, method = "spearman")
+cor.test(communitymore$net_change, communitymore$oyster_eng_change, method = "spearman")
+@
+
+Because Spearman tests are great for non-normally distributed, skewed data, I've chosen to focus on those and have consistency across the different scales. But as a quick test for other ways to look at this data, let's try transforming them to some sort of normality, at least as visible in a histogram. Here's one example for local scale commercial engagement
+<<fig=TRUE>>=
+local$lognetchange <- (local[,7] + 20000)^3
+local$logcomeng <- log(local[,8]+1)
+mod <- lm(localless$comeng~localless$net_change)
+modmore <- lm(localmore$comeng~localmore$net_change)
+u <- ggplot(data=local,aes(x=lognetchange, y=logcomeng))
+u + geom_point() + xlab("Net Change in Wetlands, cubed") + ylab("log(Commercial Engagement)")
+@
+
+After some discussion about trying to simplify the story here, let's see if just wetland loss helps clarify the relationships any. First, commercial engagement at various scales:
+<<>>=
+cor.test(local$Loss, local$comeng, method = "spearman")
+cor.test(parish$Loss, parish$comeng, method = "spearman")
+cor.test(huc$Loss, huc$comeng, method = "spearman")
+cor.test(community$Loss, community$comeng, method = "spearman")
+@
+So pattern holds true, but now local (trip ticket areas) and community areas are both significant, and parishes are headed that way. So it is a clearer story and makes trip ticket areas and community designations more similar than they were previously, despite very different data sources and methodology. Now for some graphs.
+<<fig=TRUE>>=
+mod = lm(local$comeng ~ local$Loss)
+u <- ggplot(data=local, aes(x=Loss, y=comeng))
+u + geom_point() + xlab("Wetland loss, acres") + ylab("Commercial Engagement Index") + geom_abline(slope=mod$coefficients[2], intercept = mod$coefficients[1]) + theme_grey(base_size=18)
+@
+
+<<fig=TRUE>>=
+u <- ggplot(data=parish, aes(x=Loss, y=comeng))
+u + geom_point() + xlab("Wetland loss, acres") + ylab("Commercial Engagement Index") + theme_grey(base_size=18)
+@
+
+<<fig=TRUE>>=
+u <- ggplot(data=huc, aes(x=Loss, y=comeng))
+u + geom_point() + xlab("Wetland loss, acres") + ylab("Commercial Engagement Index") + theme_grey(base_size=18)
+@
+
+
+
+For a comparison of indicators, and to show the "simpler" ecological story, here's the oyster correlations with loss, with graphs:
+<<fig=TRUE>>=
+cor.test(local$Loss, local$lbs_oyster, method = "spearman")
+local$millbs_oyster <- local$lbs_oyster/1000000
+mod = lm(local$millbs_oyster ~ local$Loss)
+u <- ggplot(data=local, aes(x=Loss, y=millbs_oyster))
+u + geom_point() + xlab("Wetland loss, acres") + ylab("Oyster catch, million pounds") + geom_abline(slope=mod$coefficients[2], intercept = mod$coefficients[1]) + theme_grey(base_size=18)
+@
+
+<<fig=TRUE>>=
+cor.test(parish$Loss, parish$lbs_oyster, method = "spearman")
+parish$millbs_oyster <- parish$lbs_oyster/1000000
+mod = lm(parish$millbs_oyster ~ parish$Loss)
+u <- ggplot(data=parish, aes(x=Loss, y=millbs_oyster))
+u + geom_point() + xlab("Wetland loss, acres") + ylab("Oyster catch, million pounds") + geom_abline(slope=mod$coefficients[2], intercept = mod$coefficients[1]) + theme_grey(base_size=18)
+@
+
+<<fig=TRUE>>=
+cor.test(huc$Loss, huc$lbs_oyster, method = "spearman")
+huc$millbs_oyster <- huc$lbs_oyster/1000000
+mod = lm(huc$millbs_oyster ~ huc$Loss)
+u <- ggplot(data=huc, aes(x=Loss, y=millbs_oyster))
+u + geom_point() + xlab("Wetland loss, acres") + ylab("Oyster catch, million pounds") + geom_abline(slope=mod$coefficients[2], intercept = mod$coefficients[1]) + theme_grey(base_size=18)
+@
+\end{document}
