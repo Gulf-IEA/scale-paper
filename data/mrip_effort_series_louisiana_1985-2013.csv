@@ -1,0 +1,70 @@
+Marine Recreational Information Program Query Results,,,,,,,,,
+,,,,,,,,,
+Your Query Parameters:,,,,,,,,,
+,,,,,,,,,
+Query: MRIP EFFORT TIME SERIES,,,,,,,,,
+,,,,,,,,,
+Year: 1985 - 2023,,,,,,,,,
+,,,,,,,,,
+Wave: ,,,,,,,,,
+,,,,,,,,,
+Geographic Area: LOUISIANA,,,,,,,,,
+,,,,,,,,,
+Fishing Mode: SHORE AND PRIVATE/RENTAL BOATS COMBINED,,,,,,,,,
+,,,,,,,,,
+Fishing Area: STATE WATERS,,,,,,,,,
+,,,,,,,,,
+Information:,,,,,,,,,
+,,,,,,,,,
+ANGLER TRIPS,,,,,,,,,
+,,,,,,,,,
+MRIP does not support the use of estimates with a percent standard error above 50 and in those instances recommends considering higher levels of aggregation (e.g. across geographic regions or fishing modes).,,,,,,,,,
+,,,,,,,,,
+As part of the government's guidelines for statistical programs the Office of Management and Budget requires federal agencies to establish their own criteria for statistical precision.  Standard 4.1.5 in OMB Standards and Guidelines for Statistical Surveys directs federal agencies as follows: 'Prior to producing estimates establish criteria for determining when the error... associated with a direct survey estimate <or> model-based estimate or projection is too large to publicly release the estimate/projection.',,,,,,,,,
+,,,,,,,,,
+Upper and lower confidence limits are calculated using a standard 95% confidence interval.  The lower 95% confidence interval is truncated at 0 to match graph output.,,,,,,,,,
+,,,,,,,,,
+PSE or proportional standard error is automatically included in all outputs.,,,,,,,,,
+,,,,,,,,,
+Estimates with a percent standard error exceeding 50 are not statistically different from zero using a standard 95% confidence interval.,,,,,,,,,
+,,,,,,,,,
+Estimate Status,Year,Fishing Year,Cumulative Through,PSE,Does Angler Trips Meet MRIP Standard,Is Angler Trips Significantly Different From 0,Angler Trips,Angler Trips Lower 95% Confidence Limit,Angler Trips Upper 95% Confidence Limit
+FINAL,1985,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.9,YES,YES,6130849,5542043,6719656
+FINAL,1986,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.6,YES,YES,5756479,5237475,6275483
+FINAL,1987,Calendar Year (Jan 1 - Dec 31),ANNUAL,5.8,YES,YES,5542514,4912441,6172587
+FINAL,1988,Calendar Year (Jan 1 - Dec 31),ANNUAL,5.2,YES,YES,5473603,4915733,6031473
+FINAL,1989,Calendar Year (Jan 1 - Dec 31),ANNUAL,5.2,YES,YES,5472184,4914459,6029909
+FINAL,1990,Calendar Year (Jan 1 - Dec 31),ANNUAL,5.9,YES,YES,6024564,5327883,6721244
+FINAL,1991,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.7,YES,YES,6193447,5622907,6763988
+FINAL,1992,Calendar Year (Jan 1 - Dec 31),ANNUAL,4,YES,YES,6421758,5918292,6925224
+FINAL,1993,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.6,YES,YES,6684231,6081581,7286882
+FINAL,1994,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.7,YES,YES,6861379,6229309,7493449
+FINAL,1995,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.2,YES,YES,6915670,6346372,7484968
+FINAL,1996,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.7,YES,YES,7556904,6860762,8253046
+FINAL,1997,Calendar Year (Jan 1 - Dec 31),ANNUAL,5,YES,YES,7815725,7049784,8581666
+FINAL,1998,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.9,YES,YES,7965987,7200933,8731040
+FINAL,1999,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.4,YES,YES,8375268,7652985,9097551
+FINAL,2000,Calendar Year (Jan 1 - Dec 31),ANNUAL,4,YES,YES,9577428,8826558,10328298
+FINAL,2001,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.5,YES,YES,9740977,8881823,10600132
+FINAL,2002,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.6,YES,YES,9066632,8249184,9884080
+FINAL,2003,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.4,YES,YES,9471168,8654374,10287962
+FINAL,2004,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.6,YES,YES,8842385,8045156,9639615
+FINAL,2005,Calendar Year (Jan 1 - Dec 31),ANNUAL,6.2,YES,YES,8311929,7301864,9321995
+FINAL,2006,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.8,YES,YES,7709425,6984122,8434728
+FINAL,2007,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.3,YES,YES,8636227,7908366,9364088
+FINAL,2008,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.1,YES,YES,9520187,8755144,10285229
+FINAL,2009,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.1,YES,YES,10177059,9359231,10994888
+FINAL,2010,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.4,YES,YES,11122003,10162842,12081165
+FINAL,2011,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.7,YES,YES,11182662,10152515,12212809
+FINAL,2012,Calendar Year (Jan 1 - Dec 31),ANNUAL,4.8,YES,YES,10610591,9612347,11608836
+FINAL,2013,Calendar Year (Jan 1 - Dec 31),ANNUAL,3.8,YES,YES,10543866,9758559,11329173
+FINAL,2014,Calendar Year (Jan 1 - Dec 31),ANNUAL,.,,,.,.,.
+FINAL,2015,Calendar Year (Jan 1 - Dec 31),ANNUAL,.,,,.,.,.
+FINAL,2016,Calendar Year (Jan 1 - Dec 31),ANNUAL,.,,,.,.,.
+FINAL,2017,Calendar Year (Jan 1 - Dec 31),ANNUAL,.,,,.,.,.
+FINAL,2018,Calendar Year (Jan 1 - Dec 31),ANNUAL,.,,,.,.,.
+FINAL,2019,Calendar Year (Jan 1 - Dec 31),ANNUAL,.,,,.,.,.
+FINAL,2020,Calendar Year (Jan 1 - Dec 31),ANNUAL,.,,,.,.,.
+FINAL,2021,Calendar Year (Jan 1 - Dec 31),ANNUAL,.,,,.,.,.
+FINAL,2022,Calendar Year (Jan 1 - Dec 31),ANNUAL,.,,,.,.,.
+PRELIMINARY,2023,Calendar Year (Jan 1 - Dec 31),WAVE 2,.,,,.,.,.
